@@ -1,0 +1,33 @@
+version: "1.0"
+
+defaults:
+  provider: "openai"
+  model: "gpt-4o-mini"
+  temperature: 0.7
+
+tests:
+  - id: "welcome-email"
+    prompt: "Write a short welcome email for a user named {{name}}."
+    cases:
+      - input:
+          name: "Alice"
+        assert:
+          - type: "contains"
+            value: "Welcome"
+          - type: "not-contains"
+            value: "As an AI language model"
+          - type: "latency_max"
+            value: 15000
+
+  - id: "product-description"
+    prompt: "Write a one-paragraph product description for a {{product}}."
+    cases:
+      - input:
+          product: "wireless noise-cancelling headphones"
+        assert:
+          - type: "contains"
+            value: "headphones"
+          - type: "not-contains"
+            value: "I cannot"
+          - type: "latency_max"
+            value: 15000
