@@ -2,10 +2,7 @@ use crate::runner::CaseResult;
 use std::path::Path;
 
 /// Generate a self-contained HTML report file from test results.
-pub fn generate_report(
-    results: &[CaseResult],
-    output_path: &Path,
-) -> anyhow::Result<String> {
+pub fn generate_report(results: &[CaseResult], output_path: &Path) -> anyhow::Result<String> {
     let total = results.len();
     let passed = results.iter().filter(|r| r.passed).count();
     let failed = total - passed;
@@ -288,10 +285,7 @@ fn chrono_now() -> String {
     }
     let d = remaining + 1;
 
-    format!(
-        "{:04}-{:02}-{:02} {:02}:{:02} UTC",
-        y, m, d, hours, minutes
-    )
+    format!("{:04}-{:02}-{:02} {:02}:{:02} UTC", y, m, d, hours, minutes)
 }
 
 fn is_leap(y: i64) -> bool {

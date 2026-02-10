@@ -1,5 +1,5 @@
 use crate::assertions::{check_assertion, AssertionResult};
-use crate::config::{AssertionKind, Config, render_prompt};
+use crate::config::{render_prompt, AssertionKind, Config};
 use crate::providers::{self, LlmProvider, TokenUsage};
 
 use colored::*;
@@ -77,18 +77,12 @@ async fn complete_with_retry(
     let timeout_dur = Duration::from_millis(timeout_ms);
 
     loop {
-        let attempt = time::timeout(
-            timeout_dur,
-            provider.complete(prompt, model, temperature),
-        )
-        .await;
+        let attempt =
+            time::timeout(timeout_dur, provider.complete(prompt, model, temperature)).await;
 
         let result = match attempt {
             Ok(inner) => inner,
-            Err(_) => Err(anyhow::anyhow!(
-                "request timed out after {}ms",
-                timeout_ms
-            )),
+            Err(_) => Err(anyhow::anyhow!("request timed out after {}ms", timeout_ms)),
         };
 
         match result {
@@ -319,20 +313,16 @@ pub fn print_results(results: &[CaseResult], verbosity: Verbosity) {
         } else {
             String::new()
         };
-        println!(
-            "  {} {}/{} passed{}",
-            status, passed, total, cost_str
-        );
+        println!("  {} {}/{} passed{}", status, passed, total, cost_str);
         return;
     }
 
     // Normal and Verbose modes
     println!(
         "{}",
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            .bright_black()
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━".bright_black()
     );
-    // Don't print the header title here ("Prompt Sentinel — Test Results") 
+    // Don't print the header title here ("Prompt Sentinel — Test Results")
     // because watch mode prints its own header.
     // Or we keep it. Let's keep it simple.
 
@@ -401,10 +391,7 @@ pub fn print_results(results: &[CaseResult], verbosity: Verbosity) {
                 for line in output.lines() {
                     println!("       │ {}", line.bright_black());
                 }
-                println!(
-                    "       {}",
-                    "─".repeat(48).bright_black()
-                );
+                println!("       {}", "─".repeat(48).bright_black());
             }
         }
 
@@ -413,8 +400,7 @@ pub fn print_results(results: &[CaseResult], verbosity: Verbosity) {
 
     println!(
         "{}",
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            .bright_black()
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━".bright_black()
     );
     println!(
         "  {} {} passed, {} {} failed, {} total",
@@ -434,8 +420,7 @@ pub fn print_results(results: &[CaseResult], verbosity: Verbosity) {
     }
     println!(
         "{}",
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            .bright_black()
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━".bright_black()
     );
     println!();
 }

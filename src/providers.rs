@@ -87,11 +87,7 @@ impl LlmProvider for OpenAiProvider {
         let text = resp.text().await?;
 
         if !status.is_success() {
-            return Err(anyhow::anyhow!(
-                "OpenAI API error ({}): {}",
-                status,
-                text
-            ));
+            return Err(anyhow::anyhow!("OpenAI API error ({}): {}", status, text));
         }
 
         let json: serde_json::Value = serde_json::from_str(&text)?;
@@ -236,11 +232,7 @@ impl LlmProvider for WebhookProvider {
         let text = resp.text().await?;
 
         if !status.is_success() {
-            return Err(anyhow::anyhow!(
-                "Webhook error ({}): {}",
-                status,
-                text
-            ));
+            return Err(anyhow::anyhow!("Webhook error ({}): {}", status, text));
         }
 
         let json: serde_json::Value = serde_json::from_str(&text)

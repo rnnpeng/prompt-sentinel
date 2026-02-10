@@ -385,11 +385,7 @@ fn run_validate(file: &str) -> anyhow::Result<()> {
             cfg.defaults.model.bold()
         );
     } else {
-        println!(
-            "  {} Found {} issue(s):",
-            "✗".red().bold(),
-            issues.len()
-        );
+        println!("  {} Found {} issue(s):", "✗".red().bold(), issues.len());
         println!();
         for issue in &issues {
             println!("    {} {}", "•".red(), issue);
@@ -418,10 +414,7 @@ fn run_init() -> anyhow::Result<()> {
 
     let tests_path = Path::new("tests.yaml");
     if tests_path.exists() {
-        println!(
-            "  {} tests.yaml already exists, skipping.",
-            "⚠".yellow()
-        );
+        println!("  {} tests.yaml already exists, skipping.", "⚠".yellow());
     } else {
         let template = r#"version: "1.0"
 
@@ -454,10 +447,7 @@ tests:
 
     let env_example_path = Path::new(".env.example");
     if env_example_path.exists() {
-        println!(
-            "  {} .env.example already exists, skipping.",
-            "⚠".yellow()
-        );
+        println!("  {} .env.example already exists, skipping.", "⚠".yellow());
     } else {
         let env_template = r#"# Prompt Sentinel — API Keys
 # Copy this file to .env and fill in your keys.
@@ -480,10 +470,7 @@ ANTHROPIC_API_KEY=sk-ant-your-key-here
 
     let env_path = Path::new(".env");
     if env_path.exists() {
-        println!(
-            "  {} .env already exists, skipping.",
-            "⚠".yellow()
-        );
+        println!("  {} .env already exists, skipping.", "⚠".yellow());
     } else {
         fs::copy(env_example_path, env_path)?;
         println!(
@@ -545,10 +532,7 @@ struct ReportUpload<'a> {
     results: &'a [runner::CaseResult],
 }
 
-async fn upload_results(
-    results: &[runner::CaseResult],
-    token: &str,
-) -> anyhow::Result<()> {
+async fn upload_results(results: &[runner::CaseResult], token: &str) -> anyhow::Result<()> {
     let api_url = std::env::var("SENTINEL_API_URL")
         .unwrap_or_else(|_| "https://app.promptsentinel.com/api/v1/reports".to_string());
 
@@ -573,10 +557,7 @@ async fn upload_results(
         .await?;
 
     if resp.status().is_success() {
-        println!(
-            "  {} Results uploaded successfully!",
-            "✓".green().bold()
-        );
+        println!("  {} Results uploaded successfully!", "✓".green().bold());
     } else {
         let status = resp.status();
         let body = resp.text().await.unwrap_or_default();

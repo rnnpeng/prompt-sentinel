@@ -203,14 +203,19 @@ pub fn load_config(path: &str) -> anyhow::Result<Config> {
     for test in &mut config.tests {
         if let Some(csv_file) = &test.cases_file {
             let csv_path = base_dir.join(csv_file);
-            let mut rdr = csv::Reader::from_path(&csv_path)
-                .map_err(|e| anyhow::anyhow!("Failed to open CSV '{}': {}", csv_path.display(), e))?;
+            let mut rdr = csv::Reader::from_path(&csv_path).map_err(|e| {
+                anyhow::anyhow!("Failed to open CSV '{}': {}", csv_path.display(), e)
+            })?;
 
             let headers = rdr.headers()?.clone();
 
             for result in rdr.records() {
                 let record = result.map_err(|e| {
-                    anyhow::anyhow!("Failed to parse CSV record in '{}': {}", csv_path.display(), e)
+                    anyhow::anyhow!(
+                        "Failed to parse CSV record in '{}': {}",
+                        csv_path.display(),
+                        e
+                    )
                 })?;
 
                 let mut input = HashMap::new();
@@ -265,24 +270,30 @@ pub fn validate_config(config: &Config) -> Vec<String> {
         }
 
         if test.cases.is_empty() && test.cases_file.is_none() {
-            issues.push(format!("Test '{}': no test cases defined (inline or CSV)", test.id));
+            issues.push(format!(
+                "Test '{}': no test cases defined (inline or CSV)",
+                test.id
+            ));
         }
-        
+
         // Validate assertions logic
         // We only validate inline cases here fully. CSV cases are loaded dynamically.
         // But we should validate the "template" assertions if present.
         for (i, assertion) in test.assertions.iter().enumerate() {
-             if !KNOWN_ASSERTION_TYPES.contains(&assertion.kind.as_str()) {
-                 // Fuzzy match logic repeated...
-                 let suggestion = find_closest(&assertion.kind, KNOWN_ASSERTION_TYPES);
-                 let hint = suggestion
+            if !KNOWN_ASSERTION_TYPES.contains(&assertion.kind.as_str()) {
+                // Fuzzy match logic repeated...
+                let suggestion = find_closest(&assertion.kind, KNOWN_ASSERTION_TYPES);
+                let hint = suggestion
                     .map(|s| format!(". Did you mean '{}'?", s))
                     .unwrap_or_default();
-                 issues.push(format!(
-                     "Test '{}', default assertion {}: unknown type '{}'{}",
-                     test.id, i+1, assertion.kind, hint
-                 ));
-             }
+                issues.push(format!(
+                    "Test '{}', default assertion {}: unknown type '{}'{}",
+                    test.id,
+                    i + 1,
+                    assertion.kind,
+                    hint
+                ));
+            }
         }
 
         for (ci, case) in test.cases.iter().enumerate() {
@@ -311,12 +322,7 @@ pub fn validate_config(config: &Config) -> Vec<String> {
                     // Only validate concrete values, skip template strings
                     let is_template = assertion.value.as_str().map_or(false, |s| s.contains("{{"));
                     if !is_template {
-                         issues.push(format!(
-                            "Test '{}', case {}: {}",
-                            test.id,
-                            ci + 1,
-                            e
-                        ));
+                        issues.push(format!("Test '{}', case {}: {}", test.id, ci + 1, e));
                     }
                 }
             }

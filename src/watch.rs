@@ -1,7 +1,7 @@
 use crate::config;
 use crate::providers;
-use crate::runner::{self, Verbosity};
 use crate::report;
+use crate::runner::{self, Verbosity};
 use colored::*;
 use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
@@ -66,7 +66,7 @@ pub async fn run_watch_loop(
 
                 // Clear screen
                 print!("\x1B[2J\x1B[1;1H");
-                
+
                 println!(
                     "  {} {}",
                     "↻".bright_cyan(),
@@ -122,11 +122,11 @@ async fn run_cycle(
     if !no_validate {
         let issues = config::validate_config(&cfg);
         if !issues.is_empty() {
-             println!("\n  {} Config issues:", "✗".red().bold());
-             for issue in &issues {
-                 println!("    {} {}", "•".red(), issue);
-             }
-             return;
+            println!("\n  {} Config issues:", "✗".red().bold());
+            for issue in &issues {
+                println!("    {} {}", "•".red(), issue);
+            }
+            return;
         }
     }
 
@@ -134,22 +134,22 @@ async fn run_cycle(
     let provider = match providers::create_provider(&cfg.defaults.provider) {
         Ok(p) => Arc::from(p),
         Err(e) => {
-             println!("\n  {} Provider error: {}", "✗".red().bold(), e);
-             return;
+            println!("\n  {} Provider error: {}", "✗".red().bold(), e);
+            return;
         }
     };
 
     // 4. Run
     let filter_ref = filter.as_deref();
-    
+
     // Header for watch mode clarity
     if !json && verbosity != Verbosity::Quiet {
-         let all_tests: usize = cfg.tests.iter().map(|t| t.cases.len()).sum();
-         println!(
-              "\n  {} Running {} tests...",
-              "⚡".bright_yellow(),
-              all_tests
-         );
+        let all_tests: usize = cfg.tests.iter().map(|t| t.cases.len()).sum();
+        println!(
+            "\n  {} Running {} tests...",
+            "⚡".bright_yellow(),
+            all_tests
+        );
     }
 
     let results = runner::run_all_tests(
@@ -161,7 +161,8 @@ async fn run_cycle(
         update_snapshots,
         timeout,
         filter_ref,
-    ).await;
+    )
+    .await;
 
     // 5. Print
     if json {
@@ -178,7 +179,11 @@ async fn run_cycle(
         match report::generate_report(&results, Path::new(&path)) {
             Ok(generated) => {
                 if !json {
-                     println!("  {} Report saved to {}", "📊".bright_cyan(), generated.bold());
+                    println!(
+                        "  {} Report saved to {}",
+                        "📊".bright_cyan(),
+                        generated.bold()
+                    );
                 }
             }
             Err(e) => println!("  {} Report error: {}", "⚠".yellow(), e),
@@ -195,7 +200,7 @@ async fn run_cycle(
         // Or better: Factor `upload_results` into `report.rs` or `runner.rs`.
         // I'll skip it for v1 watch mode to keep it fast.
         if !json {
-             println!("  {} Upload skipped in watch mode", "⚠".yellow());
+            println!("  {} Upload skipped in watch mode", "⚠".yellow());
         }
     }
 }

@@ -31,10 +31,7 @@ async fn setup_mock_openai(response_text: &str) -> MockServer {
 
     Mock::given(method("POST"))
         .and(path("/v1/chat/completions"))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .set_body_json(body),
-        )
+        .respond_with(ResponseTemplate::new(200).set_body_json(body))
         .mount(&server)
         .await;
 
@@ -47,10 +44,7 @@ async fn setup_rate_limited_server() -> MockServer {
 
     Mock::given(method("POST"))
         .and(path("/v1/chat/completions"))
-        .respond_with(
-            ResponseTemplate::new(429)
-                .set_body_string("rate limited"),
-        )
+        .respond_with(ResponseTemplate::new(429).set_body_string("rate limited"))
         .mount(&server)
         .await;
 
@@ -72,10 +66,7 @@ async fn setup_mock_webhook(response_text: &str) -> MockServer {
 
     Mock::given(method("POST"))
         .and(path("/complete"))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .set_body_json(body),
-        )
+        .respond_with(ResponseTemplate::new(200).set_body_json(body))
         .mount(&server)
         .await;
 
@@ -117,9 +108,8 @@ mod provider_tests {
     async fn test_webhook_provider() {
         let server = setup_mock_webhook("Webhook response!").await;
 
-        let provider = prompt_sentinel::providers::WebhookProvider::new(
-            format!("{}/complete", server.uri()),
-        );
+        let provider =
+            prompt_sentinel::providers::WebhookProvider::new(format!("{}/complete", server.uri()));
 
         let result = prompt_sentinel::providers::LlmProvider::complete(
             &provider,
@@ -175,7 +165,12 @@ mod cost_tests {
         // output: 200/1M * 0.60 = 0.000120
         // total = 0.000135
         let expected = 0.000135;
-        assert!((cost - expected).abs() < 1e-9, "Expected ~{}, got {}", expected, cost);
+        assert!(
+            (cost - expected).abs() < 1e-9,
+            "Expected ~{}, got {}",
+            expected,
+            cost
+        );
     }
 
     #[test]
@@ -192,8 +187,12 @@ mod cost_tests {
     #[test]
     fn test_known_model_pricing_exists() {
         let known = vec![
-            "gpt-4o", "gpt-4o-mini", "gpt-4", "gpt-3.5-turbo",
-            "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022",
+            "gpt-4o",
+            "gpt-4o-mini",
+            "gpt-4",
+            "gpt-3.5-turbo",
+            "claude-3-5-sonnet-20241022",
+            "claude-3-5-haiku-20241022",
         ];
         for model in known {
             let (input, output) = cost_per_million_tokens(model);
@@ -270,14 +269,28 @@ mod assertion_tests {
     #[test]
     fn test_json_valid_pass() {
         let kind = AssertionKind::JsonValid;
-        let result = check_assertion(&kind, r#"{"name": "Alice"}"#, 100, "test", &PathBuf::new(), false);
+        let result = check_assertion(
+            &kind,
+            r#"{"name": "Alice"}"#,
+            100,
+            "test",
+            &PathBuf::new(),
+            false,
+        );
         assert!(result.passed);
     }
 
     #[test]
     fn test_json_valid_fail() {
         let kind = AssertionKind::JsonValid;
-        let result = check_assertion(&kind, "not json at all", 100, "test", &PathBuf::new(), false);
+        let result = check_assertion(
+            &kind,
+            "not json at all",
+            100,
+            "test",
+            &PathBuf::new(),
+            false,
+        );
         assert!(!result.passed);
     }
 
@@ -464,7 +477,9 @@ tests:
         let cfg = load_config(tmp.path().to_str().unwrap()).unwrap();
         let issues = validate_config(&cfg);
         // webhook is a known provider — should not show "Unknown provider" error
-        assert!(!issues.iter().any(|i| i.contains("Unknown default provider")));
+        assert!(!issues
+            .iter()
+            .any(|i| i.contains("Unknown default provider")));
     }
 }
 

@@ -11,7 +11,7 @@ fn test_csv_loading() {
     writeln!(csv_file, "Bob,Hello Bob").unwrap();
 
     let csv_path = csv_file.path().to_str().unwrap();
-    
+
     // 2. Create a config that references it
     // Note: We need the CSV path relative to the config file location for load_config logic
     // But since we are using tempfiles, we can just use absolute paths if the logic supports it.
@@ -52,8 +52,12 @@ tests:
     // Templated assertion should be rendered
     // Wait, render_assertions renders AT LOAD TIME based on input vars.
     // So "value" should be "Hello Alice"
-    if let prompt_sentinel::config::AssertionKind::Contains(val) = 
-        prompt_sentinel::config::AssertionKind::from_raw(&case1.assertions[0].kind, &case1.assertions[0].value).unwrap() 
+    if let prompt_sentinel::config::AssertionKind::Contains(val) =
+        prompt_sentinel::config::AssertionKind::from_raw(
+            &case1.assertions[0].kind,
+            &case1.assertions[0].value,
+        )
+        .unwrap()
     {
         assert_eq!(val, "Hello Alice");
     } else {
@@ -63,8 +67,12 @@ tests:
     // Row 2: Bob
     let case2 = &test.cases[1];
     assert_eq!(case2.input.get("name").map(|s| s.as_str()), Some("Bob"));
-     if let prompt_sentinel::config::AssertionKind::Contains(val) = 
-        prompt_sentinel::config::AssertionKind::from_raw(&case2.assertions[0].kind, &case2.assertions[0].value).unwrap() 
+    if let prompt_sentinel::config::AssertionKind::Contains(val) =
+        prompt_sentinel::config::AssertionKind::from_raw(
+            &case2.assertions[0].kind,
+            &case2.assertions[0].value,
+        )
+        .unwrap()
     {
         assert_eq!(val, "Hello Bob");
     } else {
