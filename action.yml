@@ -41,4 +41,4 @@ runs:
       run: |
         echo "Installing Prompt Sentinel..."
         cargo install --path .
-        echo "Sentinal installed successfully!"
+        echo "Sentinel installed successfully!"
